@@ -1,0 +1,4 @@
+hyperparameters:
+  hidden_size: 256
+  batch_size: 64
+  keep_%: 60
