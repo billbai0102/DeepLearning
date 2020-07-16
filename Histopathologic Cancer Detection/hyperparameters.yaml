@@ -1,0 +1,17 @@
+hyperparameters:
+  # not model
+  batch_size: 64
+  num_workers: 2
+
+  # model
+  input_shape: [3, 96, 96] # [channels, height, width]
+  dropout: 0.25 # probability
+  linear1: 256
+  linear2: 128
+  classes: 2
+
+  # convolution layers - [out, kernel_size, stride, padding]
+  conv1: [64,  3, 1, 1]
+  conv2: [128, 3, 1, 1]
+  conv3: [256, 3, 1, 1]
+  conv4: [256, 3, 1, 1]
