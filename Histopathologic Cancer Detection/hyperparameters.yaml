@@ -11,7 +11,7 @@ hyperparameters:
   classes: 2
 
   # convolution layers - [out, kernel_size, stride, padding]
-  conv1: [64,  3, 1, 1]
-  conv2: [128, 3, 1, 1]
-  conv3: [256, 3, 1, 1]
-  conv4: [256, 3, 1, 1]
+  conv1: [8,  3, 1, 1]
+  conv2: [32, 3, 1, 1]
+  conv3: [64, 3, 1, 1]
+  conv4: [32, 3, 1, 1]
