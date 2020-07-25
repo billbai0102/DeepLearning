@@ -1,5 +1,3 @@
-"""
-Hyperparameters for tuning the network
-"""
 hyperparameters:
   epochs: 30
+  batch_size: 64

@@ -1,6 +1,7 @@
 """
-Neural network class for the STL-10 classifeir
+Neural Network class for the STL-10 classifeir
 """
+
 import torch
 from torch import nn
 from torchsummary import summary
