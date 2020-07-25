@@ -2,7 +2,7 @@ hyperparameters:
   # not model
   batch_size: 512
   num_workers: 2
-  epochs: 10
+  epochs: 40
 
   # model
   input_shape: [3, 96, 96] # [channels, height, width]
