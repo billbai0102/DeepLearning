@@ -1,0 +1,5 @@
+"""
+Hyperparameters for tuning the network
+"""
+hyperparameters:
+  epochs: 30
