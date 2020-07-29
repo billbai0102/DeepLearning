@@ -1,2 +1,2 @@
 # DeepLearning
-Collection of my deep learning projects !
+Collection of my deep learning projects.
