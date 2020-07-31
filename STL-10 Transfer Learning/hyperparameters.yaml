@@ -1,6 +1,6 @@
 hyperparameters:
   epochs: 50
-  batch_size: 512
+  batch_size: 1024
   num_classes: 10
 
   input_size: [3, 96, 96]
