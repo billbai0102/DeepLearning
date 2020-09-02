@@ -3,3 +3,4 @@ CIFAR10 Classifier/data/
 */data
 */.idea
 .ignore/
+*/__pycache__
