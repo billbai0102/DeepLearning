@@ -57,3 +57,6 @@ class Discriminator(nn.Module):
         img = img.view(img.size(0), -1)
         x = torch.cat((img, self.embedding(labels)), -1)
         return self.dis(x)
+
+    def dis_loss(self, output, label):
+        return self.loss(output, label)
