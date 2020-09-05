@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from torchsummary import summary
 
 from hyperparameters import *
 
@@ -70,16 +71,6 @@ class UNetSkipOutermostBlock(nn.Module):
 
 
 class UNet(nn.Module):
-    '''
-    \______________ |   <- outermost
-     \_____________|
-      \___________|
-       \_________|
-        \_______|
-         \_____|
-          \___|
-           \_|          <- innermost
-    '''
     def __init__(self):
         super(UNet, self).__init__()
 

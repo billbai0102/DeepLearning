@@ -1,0 +1,2 @@
+HIDDEN = 64
+DIS_LAYERS = 3
