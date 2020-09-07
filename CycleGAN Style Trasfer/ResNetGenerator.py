@@ -47,19 +47,18 @@ class Generator(nn.Module):
             layers = []
 
             if transpose:
-                layers += nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding)
+                layers.append(nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding))
             else:
-                layers += nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
+                layers.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding))
 
-            layers += nn.InstanceNorm2d(out_channels)
-            layers += nn.ReLU(inplace=True)
+            layers.append(nn.InstanceNorm2d(out_channels))
+            layers.append(nn.ReLU(inplace=True))
 
             return layers
 
-        model = []
-
         # input
-        model += nn.ReflectionPad2d(3)
+        model = []
+        model.append(nn.ReflectionPad2d(3))
         model += _layer(CHANNELS, GEN_HIDDEN, 7, 1, 0)
 
         # downsample
@@ -85,3 +84,8 @@ class Generator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
+
+if __name__ == '__main__':
+    print(summary(Generator().cuda(), input_size=(3, 256, 256)))
+    # print(Generator())
