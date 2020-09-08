@@ -25,9 +25,15 @@ class BaseModel:
         """
         pass
 
-    def train(self):
+    def train(self, epochs):
         """
         train loop
+        """
+        pass
+
+    def _init_optim(self):
+        """
+        initializes optimizers
         """
         pass
 

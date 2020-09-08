@@ -34,3 +34,8 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
+
+if __name__ == '__main__':
+    print(summary(Discriminator().cuda(), input_size=(3, 256, 256)))
+    print(Discriminator())
