@@ -20,7 +20,7 @@ class CycleGANDataset(Dataset):
 
     def __getitem__(self, idx):
         item_A = self.transform(Image.open(self.path_A[idx % len(self.path_A)]))
-        item_B = self.transform(Image.open(self.path_A[idx % len(self.path_A)]))
+        item_B = self.transform(Image.open(self.path_B[random.randint(0, len(self.path_B) - 1)]))
 
         if self.train:
             return {

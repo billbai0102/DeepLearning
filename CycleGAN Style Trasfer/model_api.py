@@ -3,6 +3,7 @@ from torch import nn
 from torch import optim
 from torchvision.utils import save_image
 
+import os
 import time
 import random
 import itertools
@@ -43,6 +44,7 @@ class GAN(BaseModel):
 
         self.dl = dl
         self.test_dl = test_dl
+        self.cycles = 0
 
         # instantiate generators and initialize weights
         self.G_AB = Generator().cuda()
@@ -132,10 +134,11 @@ class GAN(BaseModel):
         self.G_BA.train()
         self.D_A.train()
         self.D_B.train()
-
+        
+        # IMG_SIZE//2**4
         # tensors for real and fake data
-        real_label = torch.ones((self.dl.batch_size, 1, IMG_SIZE//2**4, IMG_SIZE//2**4)).cuda()
-        fake_label = torch.zeros((self.dl.batch_size, 1, IMG_SIZE // 2 ** 4, IMG_SIZE // 2 ** 4)).cuda()
+        real_label = torch.ones((self.dl.batch_size, 1, 29, 29)).cuda()
+        fake_label = torch.zeros((self.dl.batch_size, 1, 29, 29)).cuda()
 
         # buffers
         buffer_A = Buffer(50)
@@ -145,6 +148,7 @@ class GAN(BaseModel):
         for epoch in range(epochs):
             running_time = time.time()
             for idx, data in enumerate(self.dl):
+                self.cycles += 1
                 # move data to CUDA
                 real_A = data['train_A'].cuda()
                 real_B = data['train_B'].cuda()
@@ -161,6 +165,12 @@ class GAN(BaseModel):
                 # cycle loss
                 cyc_B = self.G_AB(fake_A)
                 cyc_A = self.G_BA(fake_B)
+#                 print(fake_B.shape)
+#                 print(fake_A.shape)
+#                 print(cyc_B.shape)
+#                 print(cyc_A.shape)
+#                 print(real_B.shape)
+#                 print(real_A.shape)
                 loss_cyc_B = self.crit_cyc(cyc_B, real_B)
                 loss_cyc_A = self.crit_cyc(cyc_A, real_A)
                 loss_cyc = (loss_cyc_B + loss_cyc_A) / 2
@@ -196,7 +206,7 @@ class GAN(BaseModel):
                 loss_D = (loss_D_A + loss_D_B) / 2
 
                 '''Status updates'''
-                if idx != 0 and idx % (self.dl.batch_size / 2) == 0:
+                if self.cycles % 100 == 0:
                     loss_D = loss_D.mean().item()
                     loss_G = loss_G.mean().item()
 
@@ -225,7 +235,7 @@ class GAN(BaseModel):
                         )
 
                     # print status
-                    print(f'\nEpoch: {epoch}/{epochs} -- Batch: {idx}/{self.dl.batch_size}'
+                    print(f'\nEpoch: {epoch}/{epochs} -- Batch: {idx}/{len(self.dl.dataset)}'
                           f'\nDiscriminator loss: {loss_D:.4f} Generator loss: {loss_G:.4f}'
                           f'\nTime taken: {time.time() - running_time:.4f}s')
 

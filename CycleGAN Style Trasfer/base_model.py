@@ -6,11 +6,11 @@ import os
 
 class BaseModel:
     def __init__(self):
-        if os.path.exists('./progress_images'):
+        if not os.path.exists('./progress_images'):
             os.mkdir('./progress_images')
-        if os.path.exists('./pt'):
+        if not os.path.exists('./pt'):
             os.mkdir('./pt')
-        if os.path.exists('./eval'):
+        if not os.path.exists('./eval'):
             os.mkdir('./eval')
 
     @property
