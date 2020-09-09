@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torch import optim
+from torchvision.utils import save_image
 
 import time
 import random
@@ -66,6 +67,12 @@ class GAN(BaseModel):
         self.crit_cyc = nn.L1Loss()   # cycle loss
         self.crit_ide = nn.L1Loss()   # identity loss
 
+        # hist
+        self.hist = {
+            'loss_D': [],
+            'loss_G': [],
+        }
+
     @property
     def generator_AB(self):
         return self.G_AB
@@ -81,6 +88,9 @@ class GAN(BaseModel):
     @property
     def discriminator_B(self):
         return self.D_B
+
+    def hist(self):
+        return self.hist
 
     def _init_optim(self):
         self.optim_G = optim.Adam(
@@ -105,6 +115,12 @@ class GAN(BaseModel):
             , lr=LR
             , betas=BETAS
         )
+
+    def save_models(self, epoch):
+        torch.save(self.G_AB.state_dict(), f'./pt/epoch{epoch}/G_AB.pt')
+        torch.save(self.G_BA.state_dict(), f'./pt/epoch{epoch}/G_BA.pt')
+        torch.save(self.D_A.state_dict(), f'./pt/epoch{epoch}/D_A.pt')
+        torch.save(self.D_B.state_dict(), f'./pt/epoch{epoch}/D_B.pt')
 
     def train(self, epochs):
         """
@@ -159,14 +175,94 @@ class GAN(BaseModel):
                 self.optim_G.step()
 
                 '''Train Discriminators'''
+                # train discriminator A
                 self.optim_D_A.zero_grad()
+                fake_A = buffer_A.update(fake_A)
+                loss_real = self.crit_adv(self.D_A(real_A), real_label)
+                loss_fake = self.crit_adv(self.D_A(fake_A.detach()), fake_label)
+                loss_D_A = (loss_real + loss_fake) / 2
+                loss_D_A.backward()
+                self.optim_D_A.step()
+
+                # train discriminator B
                 self.optim_D_B.zero_grad()
+                fake_B = buffer_B.update(fake_B)
+                loss_real = self.crit_adv(self.D_B(real_B), real_label)
+                loss_fake = self.crit_adv(self.D_B(fake_B.detach()), fake_label)
+                loss_D_B = (loss_real + loss_fake) / 2
+                loss_D_B.backward()
+                self.optim_D_B.step()
 
-                
+                loss_D = (loss_D_A + loss_D_B) / 2
 
+                '''Status updates'''
+                if idx != 0 and idx % (self.dl.batch_size / 2) == 0:
+                    loss_D = loss_D.mean().item()
+                    loss_G = loss_G.mean().item()
 
+                    # add loss to history
+                    self.hist['loss_D'].append(loss_D)
+                    self.hist['loss_G'].append(loss_G)
 
+                    # save sample images of progress
+                    with torch.no_grad():
+                        data = next(iter(self.test_dl))
+                        real_A = data['test_A'].cuda()
+                        real_B = data['test_B'].cuda()
+                        fake_A = self.G_BA(real_B)
+                        fake_B = self.G_AB(real_A)
+                        img_sample = torch.cat((
+                            real_A
+                            , fake_B
+                            , real_B
+                            , fake_A
+                        ), 0)
+                        save_image(
+                            img_sample
+                            , f'./progress_images/out_{epoch}_{idx}.png'
+                            , nrow=self.test_dl.batch_size
+                            , normalize=True
+                        )
 
+                    # print status
+                    print(f'\nEpoch: {epoch}/{epochs} -- Batch: {idx}/{self.dl.batch_size}'
+                          f'\nDiscriminator loss: {loss_D:.4f} Generator loss: {loss_G:.4f}'
+                          f'\nTime taken: {time.time() - running_time:.4f}s')
+
+                    running_time = time.time()
+
+            # save models each epoch
+            self.save_models(epoch)
+
+    def evaluate(self, size):
+        """
+        Evaluates model
+        :param size: size of eval image
+        """
+        # set eval flags
+        self.G_AB.eval()
+        self.G_BA.eval()
+        self.D_A.eval()
+        self.D_B.eval()
+
+        with torch.no_grad():
+            for idx, data in enumerate(self.test_dl):
+                real_A = data['test_A'].cuda()
+                real_B = data['test_B'].cuda()
+                fake_A = self.G_BA(real_B)
+                fake_B = self.G_AB(real_A)
+                img_sample = torch.cat((
+                    real_A
+                    , fake_B
+                    , real_B
+                    , fake_A
+                ), 0)
+                save_image(
+                    img_sample
+                    , f'./eval/eval_{idx}.png'
+                    , nrow=size
+                    , normalize=True
+                )
 
 
 

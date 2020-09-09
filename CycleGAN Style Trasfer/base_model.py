@@ -10,6 +10,8 @@ class BaseModel:
             os.mkdir('./progress_images')
         if os.path.exists('./pt'):
             os.mkdir('./pt')
+        if os.path.exists('./eval'):
+            os.mkdir('./eval')
 
     @property
     def generator(self):
@@ -30,6 +32,11 @@ class BaseModel:
         train loop
         """
         pass
+
+    def eval(self, size):
+        """
+        evaluates model
+        """
 
     def _init_optim(self):
         """
