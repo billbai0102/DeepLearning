@@ -4,3 +4,4 @@ CIFAR10 Classifier/data/
 */.idea
 .ignore/
 */__pycache__
+*/ipynb_checkpoints
