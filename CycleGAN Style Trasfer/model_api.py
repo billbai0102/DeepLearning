@@ -69,6 +69,9 @@ class GAN(BaseModel):
         self.crit_cyc = nn.L1Loss()   # cycle loss
         self.crit_ide = nn.L1Loss()   # identity loss
 
+        # checkpoint for loading previous progress
+        self.checkpoint = 0
+
         # hist
         self.hist = {
             'loss_D': [],
@@ -119,16 +122,32 @@ class GAN(BaseModel):
         )
 
     def save_models(self, epoch):
-        torch.save(self.G_AB.state_dict(), f'./pt/epoch{epoch}/G_AB.pt')
-        torch.save(self.G_BA.state_dict(), f'./pt/epoch{epoch}/G_BA.pt')
-        torch.save(self.D_A.state_dict(), f'./pt/epoch{epoch}/D_A.pt')
-        torch.save(self.D_B.state_dict(), f'./pt/epoch{epoch}/D_B.pt')
+        torch.save(self.G_AB.state_dict(), './pt/G_AB.pt')
+        torch.save(self.G_BA.state_dict(), './pt/G_BA.pt')
+        torch.save(self.D_A.state_dict(), './pt/D_A.pt')
+        torch.save(self.D_B.state_dict(), './pt/D_B.pt')
+        torch.save(self.optim_G.state_dict(), './pt/optim_G.pt')
+        torch.save(self.optim_D_A.state_dict(), './pt/optim_D_A.pt')
+        torch.save(self.optim_D_B.state_dict(), './pt/optim_D_B.pt')
+
+    def load_previous_progress(self, epoch):
+        self.checkpoint = epoch
+        self.G_AB.load_state_dict(torch.load('./pt/G_AB.pt'))
+        self.G_BA.load_state_dict(torch.load('./pt/G_BA.pt'))
+        self.D_A.load_state_dict(torch.load('./pt/D_A.pt'))
+        self.D_B.load_state_dict(torch.load('./pt/D_B.pt'))
+        self.optim_G.load_state_dict(torch.load('./pt/optim_G.pt'))
+        self.optim_D_A.load_state_dict(torch.load('./pt/optim_D_A.pt'))
+        self.optim_D_B.load_state_dict(torch.load('./pt/optim_D_B.pt'))
 
     def train(self, epochs):
         """
         training loop
         :param epochs: epochs to train for
         """
+        # for loading previous progress
+        epochs -= self.checkpoint
+
         # set train flag for all models
         self.G_AB.train()
         self.G_BA.train()
@@ -229,7 +248,7 @@ class GAN(BaseModel):
                         ), 0)
                         save_image(
                             img_sample
-                            , f'./progress_images/out_{epoch}_{idx}.png'
+                            , f'./progress_images/out_{epoch + self.checkpoint}_{idx}.png'
                             , nrow=self.test_dl.batch_size
                             , normalize=True
                         )
