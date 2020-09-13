@@ -34,3 +34,7 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         return torch.sigmoid(self.discriminator(x).view(x.size(0)))
+
+
+if __name__ == '__main__':
+    print(summary(Discriminator().cuda(), input_size=(3, 256, 256)))
