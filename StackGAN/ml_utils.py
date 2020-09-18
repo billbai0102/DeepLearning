@@ -4,6 +4,7 @@ models.
 """
 import os
 import torch
+import argparse
 
 
 '''OS RELATED UTILS'''
@@ -14,6 +15,31 @@ def create_dir(dir_name):
     """
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
+
+
+def str2bool(val):
+    """
+    Returns a boolean value based on a string passed through command line
+    :param val: boolean string
+    :return: True or False
+    """
+    if isinstance(val, bool):
+        return val
+    if val.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif val.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+def check_mode(train, val):
+    if (train and val) or (not train and not val):
+        raise Exception('Please enter either train or eval mode.')
+    elif train:
+        return 'train'
+    elif val:
+        return 'eval'
 
 
 '''Logging'''

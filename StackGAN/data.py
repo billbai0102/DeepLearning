@@ -1,8 +1,10 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 
+import io
 import h5py
 import numpy as np
+from PIL import Image
 
 class DataStream:
     def __init__(self, dl):
@@ -42,8 +44,6 @@ class StackGANDataset(Dataset):
         self.dataset = None
         self.dataset_keys = None
 
-        self.h5_int = lambda x: int(np.array(x))
-
     def __len__(self):
         f = h5py.File(self.file, 'r')
         self.dataset_keys = [str(key) for key in f[self.split].keys()]
@@ -53,4 +53,34 @@ class StackGANDataset(Dataset):
         return length
 
     def __getitem__(self, idx):
+        if self.dataset is None:
+            self.dataset = h5py.File(self.file, mode='r')
+            self.dataset_keys = [str(key) for key in self.dataset[self.split].keys()]
+
+        idx_name = self.dataset_keys[idx]
+        data = self.dataset[self.split][idx_name]
+
+        image = bytes(np.array(data['img']))
+        image = Image.open(io.BytesIO(image)).resize((64, 64))
+        image = self.preprocess(image)
+
+        embed = np.array(data['embeddings'], dtype=float)
+        txt = np.array(data['txt']).astype(str)
+
+        item = {
+            'image': torch.FloatTensor(image),
+            'embed': torch.FloatTensor(embed),
+            'txt': str(txt)
+        }
+
+    def preprocess(self, image):
+        image = np.array(image, dtype=float)
+        if len(image.shape) < 3:
+            rgb = np.empty((64, 64, 3), dtype=np.float32)
+            rgb[:, :, 0] = image
+            rgb[:, :, 1] = image
+            rgb[:, :, 1] = image
+            image = rgb
+
+        return image.transpose(2, 0, 1)
 
