@@ -26,8 +26,8 @@ class GAN:
         self.embed_in_dim = EMBED_IN_DIM
         self.embed_out_dim = EMBED_OUT_DIM
 
-        self.generator = Generator(self.latent_dim, self.embed_in_dim, self.embed_out_dim).to(self.device)
-        self.discriminator = Discriminator(self.embed_out_dim, self.embed_in_dim).to(self.device)
+        self.generator = Generator().to(self.device)
+        self.discriminator = Discriminator().to(self.device)
         self.generator.apply(GAN._init_weights)
         self.discriminator.apply(GAN._init_weights)
 
@@ -77,6 +77,8 @@ class GAN:
             running_time = time.time()
             for idx, data in enumerate(self.dl):
                 self.cycles += 1
+                print(self.cycles)
+
                 image = data['image'].to(self.device)
                 embed = data['embed'].to(self.device)
 
@@ -92,12 +94,12 @@ class GAN:
                 # on fake data
                 z = torch.randn((image.shape[0], 100, 1, 1)).to(self.device)
                 g_fake = self.generator(z, embed)
-                d_fake = self.discriminator(g_fake)
-                d_loss_fake = self.loss_adv(g_fake, fake_labels)
+                d_fake, _ = self.discriminator(g_fake, embed)
+                d_loss_fake = self.loss_adv(d_fake, fake_labels)
 
                 # calculate loss
                 d_loss = (d_loss_real + d_loss_fake) / 2
-                d_loss_real.backward()
+                d_loss.backward()
                 self.optim_D.step()
 
                 '''Train generator'''
