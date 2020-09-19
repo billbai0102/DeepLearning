@@ -6,15 +6,15 @@ from hyperparameters import *
 
 
 class Generator(nn.Module):
-    def __init__(self, latent_dim, embed_in_dim, embed_out_dim):
+    def __init__(self, latent_dim=100, embed_in_dim=1024, embed_out_dim=128):
         super(Generator, self).__init__()
         self.latent_dim = latent_dim
         self.embed_in_dim = embed_in_dim
         self.embed_out_dim = embed_out_dim
 
         self.embedding = nn.Sequential(
-            nn.Linear(self.embed_dim, self.embed_out_dim)
-            , nn.BatchNorm2d(self.embed_out_dim)
+            nn.Linear(self.embed_in_dim, self.embed_out_dim)
+            , nn.BatchNorm1d(self.embed_out_dim)
             , nn.LeakyReLU(.2, inplace=True)
         )
 
@@ -66,7 +66,7 @@ class Embedding(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, embed_in_dim, embed_out_dim):
+    def __init__(self, embed_in_dim=1024, embed_out_dim=128):
         super(Discriminator, self).__init__()
         self.embed_in_dim = embed_in_dim
         self.embed_out_dim = embed_out_dim

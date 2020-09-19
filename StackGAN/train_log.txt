@@ -1,0 +1,5 @@
+
+--------------------
+Using device cuda:0
+--------------------
+Using device cuda:0

@@ -9,3 +9,5 @@ EPOCHS = 100
 BATCH_SIZE = 128
 L1_C = 50
 L2_C = 100
+
+MODE = 'train'

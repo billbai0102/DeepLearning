@@ -26,8 +26,8 @@ class GAN:
         self.embed_in_dim = EMBED_IN_DIM
         self.embed_out_dim = EMBED_OUT_DIM
 
-        self.generator = Generator(self.latent_dim, self.embed_in_dim, self.embed_out_dim)
-        self.discriminator = Discriminator(self.embed_out_dim, self.embed_in_dim)
+        self.generator = Generator(self.latent_dim, self.embed_in_dim, self.embed_out_dim).to(self.device)
+        self.discriminator = Discriminator(self.embed_out_dim, self.embed_in_dim).to(self.device)
         self.generator.apply(GAN._init_weights)
         self.discriminator.apply(GAN._init_weights)
 
@@ -49,7 +49,7 @@ class GAN:
             'g_loss': []
         }
 
-        print(f'Using device {self.device}')
+        u.log_data_to_txt('train_log', f'\nUsing device {self.device}')
 
     def _init_optim(self, lr, betas):
         self.optim_G = optim.Adam(

@@ -5,3 +5,4 @@ CIFAR10 Classifier/data/
 .ignore/
 */__pycache__
 */ipynb_checkpoints
+StackGAN/temp.py

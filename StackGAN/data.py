@@ -34,7 +34,6 @@ class DataStream:
 
         return cur_input, cur_target
 
-
 class StackGANDataset(Dataset):
     def __init__(self, file, transform, split='train'):
         self.file = file
@@ -72,6 +71,10 @@ class StackGANDataset(Dataset):
             'embed': torch.FloatTensor(embed),
             'txt': str(txt)
         }
+
+        item['image'].sub_(255./2.).div_(255./2.)
+
+        return item
 
     def preprocess(self, image):
         image = np.array(image, dtype=float)
