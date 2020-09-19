@@ -33,7 +33,10 @@ class Generator(nn.Module):
         txt = self.embedding(txt)
         txt = txt.view(txt.shape[0], txt.shape[1], 1, 1)
         z = torch.cat([txt, z], 1)
-        return self.model(z)
+        out = self.model(z)
+        # out = torch.where(torch.isnan(out), torch.zeros_like(out), out)
+        # out = torch.where(torch.isinf(out), torch.zeros_like(out), out)
+        return out
 
     @staticmethod
     def _layer(in_channels, out_channels, kernel, stride, padding, out=False):
@@ -89,6 +92,8 @@ class Discriminator(nn.Module):
         out_model = self.model(x)
         out = self.embedding(out_model, txt)
         out = self.output(out)
+        # out = torch.where(torch.isnan(out), torch.zeros_like(out), out)
+        # out = torch.where(torch.isinf(out), torch.zeros_like(out), out)
 
         return out.squeeze(), out_model
 

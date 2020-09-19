@@ -87,7 +87,7 @@ class GAN:
 
                 '''Train discriminator'''
                 # on real data
-                self.optim_D.zero_grad() # zero out gradients
+                self.optim_D.zero_grad()  # zero out gradients
                 d_real, _ = self.discriminator(image, embed)
                 d_loss_real = self.loss_adv(d_real, real_labels)
 
@@ -103,7 +103,7 @@ class GAN:
                 self.optim_D.step()
 
                 '''Train generator'''
-                self.optim_G.zero_grad() # zero out gradients
+                self.optim_G.zero_grad()  # zero out gradients
                 z = torch.randn((image.shape[0], 100, 1, 1)).to(self.device)
                 g_fake = self.generator(z, embed)
                 d_fake, act_fake = self.discriminator(g_fake, embed)
@@ -118,7 +118,7 @@ class GAN:
                 self.optim_G.step()
 
                 '''Status updates'''
-                if self.cycles % 100 == 0:
+                if self.cycles % 10 == 0:
                     d_loss = d_loss.mean().item()
                     g_loss = g_loss.mean().item()
 
@@ -126,14 +126,14 @@ class GAN:
                     self.hist['g_loss'].append(g_loss)
 
                     with torch.no_grad():
-                        img_sample = torch.cat((image[:32]), 0)
+                        img_sample = torch.cat((image[:32], g_fake[:32]), 0)
                         save_image(img_sample
                                    , f'./progress_imgs/img_{epoch}_{idx}.png'
                                    , nrow=8
                                    , normalize=True)
 
                     u.log_data_to_txt('train_log',
-                                      f'\nEpoch: {epoch}/{epochs} -- Batch: {idx}/{len(self.dl.dataset)}'
+                                      f'\nEpoch: {epoch}/{epochs} -- Batch: {idx * BATCH_SIZE}/{len(self.dl.dataset)}'
                                       f'\nDiscriminator Loss: {d_loss: .4f} Generator Loss: {g_loss:.4f}'
                                       f'\nTime taken: {time.time() - running_time:.4f}s')
                     running_time = time.time()

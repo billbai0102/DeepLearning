@@ -22,7 +22,7 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='StackGAN')
-    parser.add_argument('--epochs', type=int, default=100, help='Epochs')
+    parser.add_argument('--epochs', type=int, default=200, help='Epochs')
     parser.add_argument('--batch_size', type=int, default=256, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=2e-5, help='Learning rate')
     parser.add_argument('--l1_coefficient', type=int, default=50, help='L1 multiplier')
